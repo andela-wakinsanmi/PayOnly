@@ -1,9 +1,11 @@
 package com.andela.payonly;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,6 +16,7 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 
@@ -30,11 +33,13 @@ public class MainActivity extends AppCompatActivity {
         .clientId(CONFIG_CLIENT_ID);
 
         PayPalPayment thingToBuy;
+        Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
 
         Intent intent = new Intent(this, PayPalService.class);
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
@@ -59,11 +64,36 @@ public class MainActivity extends AppCompatActivity {
                         .getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
                 if (confirm != null) {
                     try {
-                        System.out.println(confirm.toJSONObject().toString(4));
+                        JSONObject responseObject = confirm.toJSONObject().getJSONObject("response");
+                        String paymentID = responseObject.get("id").toString();
+                        Log.d("Sauda","paymment id = " + paymentID);
+
+                        // confirm Payment
+                        PayPalConfirmation confirmation = new PayPalConfirmation(paymentID, 10.00, this);
+                        Log.d("Suada", "payPalConfirmation is " + confirmation.toString());
+
+                        confirmation.confirmPayment(new PayPalConfirmation.ConfirmationCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d("Suada", "Payment was successful");
+
+                                Toast.makeText(context, "Payment Succesful", Toast.LENGTH_LONG).show();
+
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.d("Suada", "Payment Failed");
+
+                                Toast.makeText(context, "Payment Failed", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        /*System.out.println(confirm.toJSONObject().toString(4));
                         System.out.println(confirm.getPayment().toJSONObject()
                                 .toString(4));
                         Toast.makeText(getApplicationContext(), "Order placed",
-                                Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG).show();*/
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
