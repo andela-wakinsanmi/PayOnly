@@ -57,8 +57,10 @@ public class PayPalConfirmation {
         // check payment with paypal rest api
         JsonObjectRequest paymentConfirmationRequest = new JsonObjectRequest(Request.Method.GET,
                 REST_API_URL + paymentId, null, new Response.Listener<JSONObject>() {
+
             @Override
             public void onResponse(JSONObject response) {
+                Log.d("Suada", "Jsone onject response from REST_API_URL is " + REST_API_URL + " paymentId = " + paymentId);
                 Log.d("Suada", "Jsone onject response from getConfirmationResponse is " + response.toString());
                 verifyPayment(response, callback);
             }
@@ -79,6 +81,9 @@ public class PayPalConfirmation {
                 return params;
             }
         };
+
+        Log.d("Suada", "paymentConfirmationRequest " + paymentConfirmationRequest.toString());
+
 
         requestQueue.add(paymentConfirmationRequest);
     }
@@ -149,10 +154,14 @@ public class PayPalConfirmation {
 
             if (currency.equals("USD") && this.amount == Double.valueOf(amount)
                     && paymentId.equals(responseId)) {
+                Log.d("Suada", "Called Verify Payment callback.onSuccess");
                 callback.onSuccess();
             }
-            else
+            else {
+                Log.d("Suada", "Called Verify Payment callback.onFailure");
                 callback.onFailure();
+
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
