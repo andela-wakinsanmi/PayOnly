@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
 
     private static final int REQUEST_CODE_PAYMENT = 1;
+    public static final double AMOUNT = 10.00;
 
     private static PayPalConfiguration config = new PayPalConfiguration()
         .environment(CONFIG_ENVIRONMENT)
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void makePayment(View view) {
-        thingToBuy = new PayPalPayment(new BigDecimal("10"), "USD",
+        thingToBuy = new PayPalPayment(new BigDecimal(AMOUNT), "USD",
                 "HeadSet", PayPalPayment.PAYMENT_INTENT_SALE);
         Intent intent = new Intent(MainActivity.this,
                 PaymentActivity.class);
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("Sauda","paymment id = " + paymentID);
 
                         // confirm Payment
-                        PayPalConfirmation confirmation = new PayPalConfirmation(paymentID, 10.00, this);
+                        PayPalConfirmation confirmation = new PayPalConfirmation(paymentID, AMOUNT, this);
                         Log.d("Suada", "payPalConfirmation is " + confirmation.toString());
 
                         confirmation.confirmPayment(new PayPalConfirmation.ConfirmationCallback() {
